@@ -1,0 +1,5 @@
+# Environment variables
+.env.development.local
+
+# Dependencies
+node_modules/
