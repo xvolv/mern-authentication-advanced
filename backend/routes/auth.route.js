@@ -1,13 +1,21 @@
 import { Router } from "express";
 import {
   signUp,
-  signIn,
-  signOut,
+  logIn,
+  logOut,
   verifyEmail,
+  forgotPassword,
+  resetPassword,
+  checkAuth,
 } from "../controllers/auth.controller.js";
+import { protectRoute } from "../middlewares/verifyToken.js";
 const authRouter = Router();
+authRouter.get("/check-auth", protectRoute, checkAuth);
 authRouter.post("/sign-up", signUp);
-authRouter.get("/sign-in", signIn);
-authRouter.get("/sign-out", signOut);
+authRouter.post("/log-in", logIn);
+authRouter.post("/log-out", logOut);
 authRouter.post("/verify-email", verifyEmail);
+authRouter.post("/forgot-password", forgotPassword);
+authRouter.post("/reset-password/:token", resetPassword);
+
 export default authRouter;

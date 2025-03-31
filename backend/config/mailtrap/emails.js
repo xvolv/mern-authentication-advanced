@@ -1,6 +1,10 @@
 import { client } from "./mailTrap.config.js";
 import { sender } from "./mailTrap.config.js";
-import { VERIFICATION_EMAIL_TEMPLATE } from "./email.template.js";
+import {
+  VERIFICATION_EMAIL_TEMPLATE,
+  PASSWORD_RESET_REQUEST_TEMPLATE,
+  PASSWORD_RESET_SUCCESS_TEMPLATE,
+} from "./email.template.js";
 export const sendVerificationEmail = async (email, verificationCode, next) => {
   const recipients = [
     {
@@ -18,15 +22,38 @@ export const sendVerificationEmail = async (email, verificationCode, next) => {
       )}`,
       category: "email verification",
     });
-
     console.log("email sent successfully", response);
   } catch (error) {
     console.error("Error sending email:", error);
     next(error);
   }
 };
+export const sendPasswordResetEmail = async (email, resetURL, next) => {
+  const recipients = [
+    {
+      email,
+    },
+  ];
+  try {
+    const response = await client.send({
+      from: sender,
+      to: recipients,
+      subject: "password reset",
+      html: `${PASSWORD_RESET_REQUEST_TEMPLATE.replace(
+        "{resetURL}",
+        resetURL
+      )}`,
+      category: "password reset ",
+    });
 
-export const sendWelcomeEmail = async (email, name, next) => {
+    console.log("password reset message sent successfully", response);
+  } catch (error) {
+    console.error("Error sending email:", error);
+    next(error);
+  }
+};
+
+export const sendWelcomeEmail = async (email, next) => {
   const recipients = [
     {
       email,
@@ -43,6 +70,27 @@ export const sendWelcomeEmail = async (email, name, next) => {
     });
 
     console.log("welcome email sent successfully", response);
+  } catch (error) {
+    console.error("Error sending email:", error);
+    next(error);
+  }
+};
+export const sendResetSuccessEmail = async (email, next) => {
+  const recipients = [
+    {
+      email,
+    },
+  ];
+  try {
+    const response = await client.send({
+      from: sender,
+      to: recipients,
+      subject: "password reset",
+      html: PASSWORD_RESET_SUCCESS_TEMPLATE,
+      category: "password reset success ",
+    });
+
+    console.log("reset success email sent successfully", response);
   } catch (error) {
     console.error("Error sending email:", error);
     next(error);
