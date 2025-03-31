@@ -3,6 +3,10 @@ import bcrypt from "bcryptjs";
 import { asyncErrorHandler } from "../utils/asyncErrorHandler.js";
 import { CustomError } from "../utils/customeError.js";
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
+import {
+  sendVerificationEmail,
+  sendWelcomeEmail,
+} from "../config/mailtrap/emails.js";
 export const signUp = asyncErrorHandler(async (req, res, next) => {
   const { email, password, name } = req.body;
   if (!email || !password) {
@@ -30,6 +34,7 @@ export const signUp = asyncErrorHandler(async (req, res, next) => {
   await user.save();
   // create a token send a verification email
   generateTokenAndSetCookie(res, user._id);
+  await sendVerificationEmail(user.email, user.verificationToken, next);
   const { password: userPassowrd, ...clientData } = user._doc;
   res.status(201).json({
     success: true,
@@ -43,4 +48,33 @@ export const signIn = async (req, res) => {
 };
 export const signOut = async (req, res) => {
   res.send("hello world");
+};
+
+export const verifyEmail = async (req, res, next) => {
+  const { verificationToken } = req.body;
+  try {
+    const user = await User.findOne({
+      verificationToken,
+      verificationTokenExpiresAt: { $gt: Date.now() },
+    });
+    if (!user) {
+      next(new CustomError("INVALID OR EXPIRED VERIFICATION TOKEN", 400));
+    }
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpiresAt = undefined;
+    await user.save();
+    await sendWelcomeEmail(user.email, user.name, next);
+
+    res.status(200).json({
+      success: true,
+      message: "EMAIL VERIFIED SUCCESSFULLY",
+      user: {
+        email: user.email,
+        name: user.name,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
 };
