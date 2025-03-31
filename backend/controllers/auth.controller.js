@@ -1,26 +1,24 @@
 import User from "../models/user.model.js";
-import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { asyncErrorHandler } from "../utils/asyncErrorHandler.js";
 import { CustomError } from "../utils/customeError.js";
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
 export const signUp = asyncErrorHandler(async (req, res, next) => {
   const { email, password, name } = req.body;
-
   if (!email || !password) {
     return next(
       new CustomError("BOTH EMAIL AND PASSWORD SHOULD BE PROVIDED", 400)
     );
   }
-
   const existingUser = await User.findOne({ email });
-  console.log("existing user :", existingUser);
   if (existingUser) {
     return next(new CustomError("USER ALREADY EXIST ", 400));
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  const verificationToken = crypto.randomBytes(10).toString("hex");
+  // const verificationToken = crypto.randomBytes(10).toString("hex");
+  const verificationToken =
+    Math.floor(Math.random() * (99999999 - 10000000 + 1)) + 10000000;
 
   const user = new User({
     email,

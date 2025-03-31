@@ -8,12 +8,11 @@ const app = express();
 app.use(express.json());
 app.use("/api/v1/auth", authRouter);
 app.use(globalErrorHandler);
-app.listen(PORT||5500, async () => {
-  console.log(`http://localhost/${PORT}`);
+app.listen(PORT || 5500, async () => {
+  console.log(`http://localhost:${PORT}`);
   try {
     await connectToDatabase();
-    const databaseName = mongoose.connection.name;
-    console.log("CONNECTED TO DATABASE :", databaseName);
+    console.log("CONNECTED TO DATABASE :", mongoose.connection.name);
   } catch (error) {
     console.error("Database connection failed:", error);
   }

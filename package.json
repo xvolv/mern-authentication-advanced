@@ -16,8 +16,12 @@
     "crypto": "^1.0.1",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "find-up": "^7.0.0",
+    "findup": "^0.1.5",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.13.0"
+    "mailtrap": "^4.0.0",
+    "mongoose": "^8.13.0",
+    "nodemailer": "^6.10.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.1",
